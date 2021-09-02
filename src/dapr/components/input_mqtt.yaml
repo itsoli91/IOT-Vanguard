@@ -1,0 +1,14 @@
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: v1/telemetry/publish
+spec:
+  type: bindings.mqtt
+  version: v1
+  metadata:
+  - name: url
+    value: mqtt://mqtt.broker:1883
+  - name: topic
+    value: v1/telemetry/publish
+  - name: consumerID
+    value: "{uuid}"

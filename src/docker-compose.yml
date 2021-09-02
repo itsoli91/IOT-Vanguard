@@ -1,0 +1,22 @@
+version: '3.4'
+
+services:
+  mqtt.broker:
+    image: vernemq/vernemq
+
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+
+  portainer:
+    image: portainer/portainer-ce
+
+  transport.mqtt:
+    image: ${DOCKER_REGISTRY-}transportmqtt
+    build:
+      context: .
+      dockerfile: src/Services/Transport/Transport.MQTT/Dockerfile
+
+  transport.mqtt-dapr:
+    image: "daprio/daprd:latest"
+

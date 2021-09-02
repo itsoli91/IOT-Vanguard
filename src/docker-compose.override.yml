@@ -1,0 +1,69 @@
+version: '3.4'
+
+
+services:
+
+  mqtt.broker:
+    container_name: mqtt.broker
+    image: vernemq/vernemq
+    environment:
+     - DOCKER_VERNEMQ_ACCEPT_EULA=yes
+     - DOCKER_VERNEMQ_ALLOW_ANONYMOUS=on
+    ports:
+     - "1883:1883"
+    networks:
+     - vangurdiot
+
+
+
+  rabbitmq:
+    container_name: rabbitmq
+    restart: always
+    ports:
+        - "5672:5672"
+        - "15672:15672"
+    networks:
+     - vangurdiot
+
+
+  portainer:
+    container_name: portainer
+    restart: always
+    ports:
+      - "8081:8000"
+      - "9000:9000"
+    volumes:
+      - ./docker_volumes/var/run/docker.sock:/var/run/docker.sock
+      - ./docker_volumes/portainer_data:/data
+    networks:
+     - vangurdiot
+
+
+  ## application services
+
+  transport.mqtt:
+    container_name: transport.mqtt
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "13000:80"
+      - "50001:50001"
+    networks:
+     - vangurdiot
+
+  transport.mqtt-dapr:
+    container_name: transport.mqtt-dapr
+    command: [ "./daprd",
+               "-app-id", "transport.mqtt",
+               "-app-port", "80",
+               "-components-path", "/components"]
+    depends_on:
+      - transport.mqtt
+    network_mode: "service:transport.mqtt"
+    volumes:
+    - ./dapr/components/:/components   
+
+
+
+networks:
+ vangurdiot:
