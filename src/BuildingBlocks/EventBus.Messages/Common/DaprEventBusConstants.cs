@@ -2,6 +2,6 @@
 {
     public static class DaprEventBusConstants
     {
-        public static string PubSubInternal = "pubsub-internal";
+        public  const string PubSubInternal = "pubsub-internal";
     }
 }

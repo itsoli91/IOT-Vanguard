@@ -1,8 +1,8 @@
 version: '3.4'
 
 services:
-  mqtt.broker:
-    image: vernemq/vernemq
+  #mqtt.broker:
+  #  image: vernemq/vernemq
 
 
   rabbitmq:
@@ -20,3 +20,12 @@ services:
   transport.mqtt-dapr:
     image: "daprio/daprd:latest"
 
+
+  core.api:
+    image: ${DOCKER_REGISTRY-}coreapi
+    build:
+      context: .
+      dockerfile: src/Services/Core/Core.API/Dockerfile
+
+  core.api-dapr:
+    image: "daprio/daprd:latest"

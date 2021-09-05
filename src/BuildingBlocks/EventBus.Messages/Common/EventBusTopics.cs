@@ -2,7 +2,7 @@
 {
     public static class EventBusTopics
     {
-        public static string TelemetryPublish = "telemetry/publish";
+        public const string TelemetryPublish = "telemetry/publish";
 
     }
 }

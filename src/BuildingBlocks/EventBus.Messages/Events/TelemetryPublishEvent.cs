@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace EventBus.Messages.Events
 {
@@ -8,15 +10,15 @@ namespace EventBus.Messages.Events
         {
         }
 
-        public TelemetryPublishEvent(Guid deviceId, long timestamp, object data)
+        public TelemetryPublishEvent(Guid deviceId, long timestamp, object model)
         {
             DeviceId = deviceId;
             Timestamp = timestamp;
-            Data = data;
+            Model = model;
         }
 
         public Guid DeviceId { get; set; }
         public long Timestamp { get; set; }
-        public object Data { get; set; }
+        public object Model { get; set; }
     }
 }

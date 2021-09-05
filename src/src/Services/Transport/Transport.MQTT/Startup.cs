@@ -1,8 +1,13 @@
+using System.Linq;
 using System.Text.Json;
+using Dapr.Client;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using MQTTnet.AspNetCore;
+using MQTTnet.AspNetCore.Extensions;
+using Transport.MQTT.Services;
 
 namespace Transport.MQTT
 {
@@ -13,6 +18,15 @@ namespace Transport.MQTT
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers().AddDapr();
+
+            services
+                .AddHostedMqttServer(mqttServer =>
+                {
+                    mqttServer.WithoutDefaultEndpoint();
+                    mqttServer.WithConnectionValidator(new MqttConnectionValidatorService());
+                })
+                .AddMqttConnectionHandler()
+                .AddConnections();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -25,14 +39,19 @@ namespace Transport.MQTT
 
             app.UseRouting();
 
-            // Use Cloud Events
-            //app.UseCloudEvents();
-
             app.UseEndpoints(endpoints =>
             {
-                // Map subscriber handler
-                //   endpoints.MapSubscribeHandler();
-                endpoints.MapControllers();
+                endpoints.MapConnectionHandler<MqttConnectionHandler>(
+                    "/mqtt",
+                    httpConnectionDispatcherOptions => httpConnectionDispatcherOptions.WebSockets.SubProtocolSelector =
+                        protocolList =>
+                            protocolList.FirstOrDefault() ?? string.Empty);
+            });
+
+            app.UseMqttServer(server =>
+            {
+                server.ApplicationMessageReceivedHandler =
+                    new MqttApplicationMessageHandler();
             });
         }
     }
