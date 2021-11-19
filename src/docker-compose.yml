@@ -1,25 +1,30 @@
 version: '3.4'
 
 services:
-  #mqtt.broker:
-  #  image: vernemq/vernemq
-
-
+  
   rabbitmq:
     image: rabbitmq:3-management-alpine
 
   portainer:
     image: portainer/portainer-ce
 
-  transport.mqtt:
-    image: ${DOCKER_REGISTRY-}transportmqtt
+  transport.mqtt1:
+    image: ${DOCKER_REGISTRY-}transportmqtt1
     build:
       context: .
       dockerfile: src/Services/Transport/Transport.MQTT/Dockerfile
 
-  transport.mqtt-dapr:
+  transport.mqtt2:
+    image: ${DOCKER_REGISTRY-}transportmqtt2
+    build:
+      context: .
+      dockerfile: src/Services/Transport/Transport.MQTT/Dockerfile
+
+  transport.mqtt1-dapr:
     image: "daprio/daprd:latest"
 
+  transport.mqtt2-dapr:
+    image: "daprio/daprd:latest"
 
   core.api:
     image: ${DOCKER_REGISTRY-}coreapi
@@ -29,3 +34,6 @@ services:
 
   core.api-dapr:
     image: "daprio/daprd:latest"
+
+  haproxy:
+      image:  haproxy:latest

@@ -14,17 +14,12 @@ namespace Transport.MQTT.Services
                 return;
             }
 
-            if (context.Username != "mySecretUser")
+            if (context.Username != "mySecretUser" || context.Password != "mySecretPassword")
             {
                 context.ReasonCode = MqttConnectReasonCode.BadUserNameOrPassword;
                 return;
             }
 
-            if (context.Password != "mySecretPassword")
-            {
-                context.ReasonCode = MqttConnectReasonCode.BadUserNameOrPassword;
-                return;
-            }
 
             context.ReasonCode = MqttConnectReasonCode.Success;
         }

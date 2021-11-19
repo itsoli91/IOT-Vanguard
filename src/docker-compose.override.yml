@@ -3,25 +3,14 @@ version: '3.4'
 
 services:
 
-  #mqtt.broker:
-  #  container_name: mqtt.broker
-  #  image: vernemq/vernemq
-  #  environment:
-  #   - DOCKER_VERNEMQ_ACCEPT_EULA=yes
-  #   - DOCKER_VERNEMQ_ALLOW_ANONYMOUS=on
-  #  ports:
-  #   - "1883:1883"
-  #  networks:
-  #   - vangurdiot
-
-
-
   rabbitmq:
     container_name: rabbitmq
     restart: always
     ports:
-        - "5672:5672"
         - "15672:15672"
+
+    expose:
+        - "5672" 
     networks:
      - vangurdiot
 
@@ -41,37 +30,62 @@ services:
 
   ## application services
 
-  transport.mqtt:
-    container_name: transport.mqtt
+  transport.mqtt1:
+    container_name: transport.mqtt1
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-    ports:
-      - "14000:80"
-      - "1883:1883"
+      - NodeSettings__NodeName=MQTT_SERVER_1
+    expose:
+      - "1883"
+      - "80"
 
     networks:
      - vangurdiot
 
-  transport.mqtt-dapr:
-    container_name: transport.mqtt-dapr
+  transport.mqtt1-dapr:
+    container_name: transport.mqtt1-dapr
     command: [ "./daprd",
-               "-app-id", "transport.mqtt",
+               "-app-id", "transport.mqtt1",
                "-app-port", "80",
                "-components-path", "/components"]
     depends_on:
-      - transport.mqtt
-    network_mode: "service:transport.mqtt"
+      - transport.mqtt1
+    network_mode: "service:transport.mqtt1"
     volumes:
-    - ./dapr/components/:/components   
+    - ./dapr/components/:/components  
 
 
+  transport.mqtt2:
+    container_name: transport.mqtt2
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - NodeSettings__NodeName=MQTT_SERVER_2
+    expose:
+      - "1883"
+      - "80"
+
+    networks:
+     - vangurdiot
+ 
+
+  transport.mqtt2-dapr:
+    container_name: transport.mqtt2-dapr
+    command: [ "./daprd",
+               "-app-id", "transport.mqtt2",
+               "-app-port", "80",
+               "-components-path", "/components"]
+    depends_on:
+      - transport.mqtt2
+    network_mode: "service:transport.mqtt2"
+    volumes:
+    - ./dapr/components/:/components 
 
   core.api:
     container_name: core.api
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-    ports:
-      - "14001:80"
+    expose:
+       - "80" 
     networks:
      - vangurdiot
 
@@ -86,6 +100,23 @@ services:
     network_mode: "service:core.api"
     volumes:
     - ./dapr/components/:/components   
+
+  haproxy:
+      container_name: haproxy
+      volumes:
+       - ./docker_volumes/haproxy:/usr/local/etc/haproxy:ro
+      links:
+       - transport.mqtt1
+       - transport.mqtt2
+      ports:
+       - "1883:1883"
+       - "70:70"
+      expose:
+       - "1883"
+       - "70"
+      networks:
+      - vangurdiot
+  
 
 networks:
  vangurdiot:

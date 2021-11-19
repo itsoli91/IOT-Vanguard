@@ -4,8 +4,12 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Server.Kestrel.Https;
 using MQTTnet.AspNetCore.Extensions;
 
 namespace Transport.MQTT
@@ -24,7 +28,7 @@ namespace Transport.MQTT
                     webBuilder.UseKestrel(
                         o =>
                         {
-                            o.ListenAnyIP(1883, l => l.UseMqtt()); // MQTT pipeline
+                            o.ListenAnyIP(1883, l => { l.UseMqtt(); }); // MQTT pipeline
                             o.ListenAnyIP(80); // Default HTTP pipeline
                         });
 

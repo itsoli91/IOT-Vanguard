@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Core.Infrastructure;
 
 namespace Core.API
 {
@@ -26,7 +27,7 @@ namespace Core.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
+            services.AddInfrastructureServices(Configuration);
             services.AddControllers().AddDapr();
 
             //services.AddDaprClient(builder => builder.UseJsonSerializationOptions(new JsonSerializerOptions()
